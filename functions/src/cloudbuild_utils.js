@@ -51,6 +51,11 @@ const handleProductionDeployment = async (data, repo) => {
     } else if (data.status === 'SUCCESS') {
         resText = 'Production rollout `' + LOGS('successful') 
             + '` for ' + commitLink;
+
+        if (data.status === 'SUCCESS') {
+            resText = resText + '\n Click <' + repo.productionEnvUrl + '|here> to go to production environment'
+        }
+
         resColor = colors.SUCCESS;
     } else if (data.status === 'FAILURE') {
         let failedStep = getFailedStep(data);
@@ -75,6 +80,7 @@ const handleBranchAndPRBuilds = async (data, repo) => {
     const LOGS = (name) => '<' + data.logUrl + '|' +  name + '>';
 
     let slug = '';
+    let commitLink = '';
 
     if (data.substitutions._PR_NUMBER) {
         const PR_LINK =  '<' + repo.repoLink + 'pull/' + data.substitutions._PR_NUMBER 
@@ -82,9 +88,13 @@ const handleBranchAndPRBuilds = async (data, repo) => {
         if (data.status === 'QUEUED' || data.status === 'FAILURE' || data.status === 'WORKING') slug = ' PR ' + PR_LINK;
         else if (data.status === 'SUCCESS') slug = 'PR ' + PR_LINK + '. PR is ready to be merged';
     } else {
-        const COMMIT_LINK =  '<' + repo.repoLink + 'commit/' + data.substitutions.SHORT_SHA 
+        commitLink =  '<' + repo.repoLink + 'commit/' + data.substitutions.SHORT_SHA 
                 + '|' + repo.name + '/' + data.substitutions.BRANCH_NAME + '/' + data.substitutions.SHORT_SHA +'>';
-        slug = COMMIT_LINK;
+        slug = commitLink;
+
+        if (data.status === 'SUCCESS') {
+            slug = slug + '\n Click <' + repo.stagingEnvUrl + '|here> to go to staging environment'
+        }
     }
 
     if (data.status === 'QUEUED') {
@@ -113,7 +123,7 @@ const handleBranchAndPRBuilds = async (data, repo) => {
     if (data.status === 'SUCCESS' 
             && !data.substitutions._PR_NUMBER
             && repo.deploymentSourceBranch == data.substitutions.BRANCH_NAME) {
-        const approvalInputMsg = 'Approve rollout to production for ' + slug + '?';
+        const approvalInputMsg = 'Approve rollout to production for ' + commitLink + '?';
         const msg = approval_msg.msg(approvalInputMsg,{
             value: 'yes',
             repoName: repo.name,
