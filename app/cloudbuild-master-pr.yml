@@ -1,0 +1,7 @@
+steps:
+- name: 'node:latest'
+  id: Perform Unit Tests
+  entrypoint: /bin/sh
+  args:
+  - -c
+  - 'cd ${_APP_DIR} && npm install && npm test'

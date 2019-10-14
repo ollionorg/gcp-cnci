@@ -1,0 +1,20 @@
+{
+  "name": "gcp-cnci-example-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "integration-tests": "mocha integration-tests",
+    "start": "node index.js"
+  },
+  "author": "",
+  "dependencies": {
+    "ejs": "^2.7.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "mocha": "^6.2.1",
+    "axios": "^0.19.0"
+  }
+}
