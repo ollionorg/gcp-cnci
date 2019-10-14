@@ -1,0 +1,63 @@
+steps:
+# This step deploys the new version of our container image
+# in the prashant-gcp-cicd Kubernetes Engine cluster.
+- name: 'gcr.io/cloud-builders/kubectl'
+  id: Deploy to production
+  args:
+  - 'apply'
+  - '-f'
+  - '${_PRODUCTION_KUBERNETES_CONFIG_FILE_NAME}'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_PRODUCTION_DEPLOY_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_PRODUCTION_DEPLOY_CLUSTER}'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'Decrypt Github SSH Key for repository'
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=${_GITHUB_REPO_ENC_KEY_PATH}
+  - --plaintext-file=/root/.ssh/id_rsa_repo_key
+  - --location=global
+  - --keyring=${_GITHUB_REPO_KMS_KEYRING}
+  - --key=${_GITHUB_REPO_KEY}
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+# Set up git with key and domain
+- name: 'gcr.io/cloud-builders/git'
+  id: 'Add Github Key obtained to local env'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    chmod 600 /root/.ssh/id_rsa_repo_key
+    cat <<EOF >/root/.ssh/config
+    Hostname github.com
+    IdentityFile /root/.ssh/id_rsa_repo_key
+    EOF
+    echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+
+# Clone env repo
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: Clone repository and Update Manifest on production branch
+  entrypoint: /bin/sh
+  args:
+  - '-c'
+  - |
+    git clone git@github.com:${_GITHUB_REPO_USERNAME}/$REPO_NAME.git && \
+    cd $REPO_NAME && \
+    git config user.email $(gcloud auth list --filter=status:ACTIVE --format='value(account)') && \
+    git fetch origin ${_PRODUCTION_BRANCH} && git checkout ${_PRODUCTION_BRANCH} && \
+    git checkout $COMMIT_SHA ${_PRODUCTION_KUBERNETES_CONFIG_FILE_NAME} && \
+    git commit -m "Manifest from commit $COMMIT_SHA of ${_PRODUCTION_CANDIDATE_BRANCH}
+    $(git log --format=%B -n 1 $COMMIT_SHA)" || true && \
+    git push origin ${_PRODUCTION_BRANCH} || true
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
