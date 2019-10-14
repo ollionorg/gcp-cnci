@@ -3,7 +3,7 @@ const axios = require('axios');
 const STAGING_DEPLOYMENT_API_URL = require('./config').API_BASE;
 
 // Constants
-const HOME_API_EXPECTED_MSG = 'Hello World!';
+const HOME_API_EXPECTED_MSG = 'hello, World!';
 const STAGING_ENVIRONMENT_NAME = 'staging';
 
 const HELLO_API = () => axios.get(STAGING_DEPLOYMENT_API_URL + '/hello');
