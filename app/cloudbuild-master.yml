@@ -123,7 +123,7 @@ steps:
   - |
     cd $REPO_NAME && \
     git add ${_PRODUCTION_KUBERNETES_CONFIG_FILE_NAME} && \
-    git commit -m "Deploying image gcr.io/${PROJECT_ID}/${_REPO_NAME}:${SHORT_SHA} 
+    git commit -m "Deploying image gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA} 
     Built from commit ${COMMIT_SHA} Author: $(git log --format='%an <%ae>' -n 1 HEAD)" || true && \
     git push origin ${_PRODUCTION_CANDIDATE_BRANCH} && \
     git tag 'release-'${SHORT_SHA} || true && \
