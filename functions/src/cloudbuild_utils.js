@@ -62,8 +62,8 @@ const handleBranchAndPRBuilds = async (data, repo) => {
     if (data.substitutions._PR_NUMBER) {
         const PR_LINK =  '<' + repo.repoLink + 'pull/' + data.substitutions._PR_NUMBER 
                 + '|' + repo.name + '/pull/' + data.substitutions._PR_NUMBER + '>';
-        if (data.status === 'QUEUED' || data.status === 'FAILURE' || data.status === 'WORKING') slug = ' PR ' + PR_LINK;
-        else if (data.status === 'SUCCESS') slug = 'PR ' + PR_LINK + '. PR is ready to be merged';
+        if (data.status === 'QUEUED' || data.status === 'FAILURE' || data.status === 'WORKING') slug = 'pull request ' + PR_LINK;
+        else if (data.status === 'SUCCESS') slug = 'pull request ' + PR_LINK + ', ready to merge!';
     } else {
         const commitLink =  '<' + repo.repoLink + 'commit/' + data.substitutions.SHORT_SHA 
                 + '|' + repo.name + '/' + data.substitutions.BRANCH_NAME + '/' + data.substitutions.SHORT_SHA +'>';
