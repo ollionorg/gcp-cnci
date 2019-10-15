@@ -131,4 +131,8 @@ You can get the bot user token using OAuth2 or from your slack app dashboard (if
     cd functions
     gcloud functions deploy gcpCiCdSlackEvents --runtime nodejs10 --trigger-topic cloud-builds --set-env-vars SLACK_BOT_TOKEN='{BOT_TOKEN}' --set-env-vars GCLOUD_PROJECT='cloudcover-sandbox' --service-account={CLOUDFUNCTION_SERVICE_ACCOUNT}
    ```
+
+## Screenshots and Demos
+
+![Slack Notification for CI/CD Events](docs/slack.png)
    
