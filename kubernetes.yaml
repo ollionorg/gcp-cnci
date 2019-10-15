@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: gcp-cnci-example-app-production
-        image: gcr.io/cloudcover-sandbox/gcp-cnci-example-app:f7e4586
+        image: gcr.io/cloudcover-sandbox/gcp-cnci-example-app:7d551d8
         ports:
         - containerPort: 8080
         env:
