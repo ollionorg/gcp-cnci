@@ -2,7 +2,7 @@ const config = require('./../config')
 
 function hello() { 
     return  { 
-        msg: 'hello, CldCvr!', 
+        msg: 'Hello, World!', 
         environment: config.ENV_NAME
     }
 };
