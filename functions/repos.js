@@ -7,6 +7,7 @@ module.exports = {
         'repoLink': 'https://github.com/cldcvr/gcp-cnci/',
         'productionTriggerId': 'gcp-cnci-production-deploy-trigger',
         'stagingEnvUrl': 'http://35.240.202.244/',
-        'productionEnvUrl': 'http://35.240.171.202/'
+        'productionEnvUrl': 'http://35.240.171.202/',
+        'gcrImageId': 'gcp-cnci-example-app'
     }
 }
