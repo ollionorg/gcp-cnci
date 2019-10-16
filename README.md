@@ -9,7 +9,7 @@ The /app folder contains the sample NodeJs application along with the CloudBuild
 The /functions folder contains the code for the Cloud Functions to listen to Cloudbuild updates and Slack approval events.
 
 
-## Prcess Flow
+## Process Flow
 
 The source for the application to be deployed is this GitHub repository. When a pull request is raised to the master branch it triggers CloudBuild to build and test code based on the PR. If it is successful then the user can merge the PR into the master branch. 
 
