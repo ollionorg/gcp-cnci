@@ -4,21 +4,21 @@ steps:
   entrypoint: /bin/sh
   args:
   - -c
-  - 'cd ${_APP_DIR} && npm install && npm test'
+  - 'cd app && npm install && npm test'
   
 - name: 'gcr.io/cloud-builders/docker'
   id: Build Docker Image
   args:
   - 'build'
   - '-t'
-  - 'gcr.io/$PROJECT_ID/${_IMAGE_ID}:$SHORT_SHA'
-  - '${_APP_DIR}/'
+  - 'gcr.io/$PROJECT_ID/gcp-cnci-example-app:$SHORT_SHA'
+  - 'app/'
 
 - name: 'gcr.io/cloud-builders/docker'
   id: Push Built Docker Image to GCR
   args:
   - 'push'
-  - 'gcr.io/$PROJECT_ID/${_IMAGE_ID}:$SHORT_SHA'
+  - 'gcr.io/cicd-fcamba/gcp-cnci-example-app:$SHORT_SHA'
 
 # manifest for staging
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -27,8 +27,8 @@ steps:
   args:
   - '-c'
   - |
-    cd ${_APP_DIR} && \
-    sed "s/IMAGE_TO_DEPLOY/gcr.io\/${PROJECT_ID}\/${_IMAGE_ID}:${SHORT_SHA}/g" ${_STAGING_KUBERENETES_TEMPLATE_FILE_NAME} > ${_STAGING_KUBERNETES_CONFIG_FILE_NAME}
+    cd app && \
+    sed "s/IMAGE_TO_DEPLOY/gcr.io\/cicd-fcamba\/:${SHORT_SHA}/g" staging-kubernetes.yaml.tpl > staging-kubernetes.yaml
   volumes:
   - name: 'ssh'
     path: /root/.ssh
@@ -39,10 +39,10 @@ steps:
   args:
   - 'apply'
   - '-f'
-  - '${_APP_DIR}/${_STAGING_KUBERNETES_CONFIG_FILE_NAME}'
+  - 'app/staging-kubernetes.yaml'
   env:
-  - 'CLOUDSDK_COMPUTE_ZONE=${_STAGING_DEPLOY_ZONE}'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=${_STAGING_DEPLOY_CLUSTER}'
+  - 'CLOUDSDK_COMPUTE_ZONE=Europe-west1-b'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-gke-staging'
 
 # Integration testing
 - name: 'node:latest'
@@ -52,7 +52,7 @@ steps:
   - '-c'
   - |
     sleep 45s && \
-    cd ${_APP_DIR} && npm install && npm run integration-tests
+    cd app && npm install && npm run integration-tests
 
 # Production manifest update
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -60,11 +60,11 @@ steps:
   args:
   - kms
   - decrypt
-  - --ciphertext-file=${_GITHUB_REPO_ENC_KEY_PATH}
+  - --ciphertext-file=app/repo-key-encrypted/id_rsa_repo_key.enc
   - --plaintext-file=/root/.ssh/id_rsa_repo_key
   - --location=global
-  - --keyring=${_GITHUB_REPO_KMS_KEYRING}
-  - --key=${_GITHUB_REPO_KEY}
+  - --keyring=cicd-keyring
+  - --key=cicd-key
   volumes:
   - name: 'ssh'
     path: /root/.ssh
@@ -92,9 +92,9 @@ steps:
   args:
   - '-c'
   - |
-    git clone git@github.com:${_GITHUB_REPO_USERNAME}/$REPO_NAME && \
-    cd $REPO_NAME && \
-    git checkout ${_PRODUCTION_CANDIDATE_BRANCH} && \
+    git clone git@github.com:frenkzappa/gcp-cnci && \
+    cd gcp-cnci && \
+    git checkout production-candidate && \
     git config user.email $(gcloud auth list --filter=status:ACTIVE --format='value(account)')
   volumes:
   - name: 'ssh'
@@ -108,8 +108,8 @@ steps:
   args:
   - '-c'
   - |
-    cd $REPO_NAME && \
-    sed "s/IMAGE_TO_DEPLOY/gcr.io\/${PROJECT_ID}\/${_IMAGE_ID}:${SHORT_SHA}/g" ${_PRODUCTION_KUBERENETES_TEMPLATE_FILE_NAME} > ${_PRODUCTION_KUBERNETES_CONFIG_FILE_NAME}
+    cd gcp-cnci && \
+    sed "s/IMAGE_TO_DEPLOY/gcr.io\/cicd-fcamba\/gcp-cnci-example-app:${SHORT_SHA}/g" kubernetes.yaml.tpl > kubernetes.yaml
   volumes:
   - name: 'ssh'
     path: /root/.ssh
@@ -121,11 +121,11 @@ steps:
   args:
   - '-c'
   - |
-    cd $REPO_NAME && \
-    git add ${_PRODUCTION_KUBERNETES_CONFIG_FILE_NAME} && \
-    git commit -m "Deploying image gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA} 
+    cd gcp-cnci && \
+    git add kubernetes.yaml && \
+    git commit -m "Deploying image gcr.io/cicd-fcamba/gcp-cnci:${SHORT_SHA} 
     Built from commit ${COMMIT_SHA} Author: $(git log --format='%an <%ae>' -n 1 HEAD)" || true && \
-    git push origin ${_PRODUCTION_CANDIDATE_BRANCH} && \
+    git push origin production-candidate && \
     git tag 'release-'${SHORT_SHA} || true && \
     git push origin 'release-'${SHORT_SHA}
   volumes:
