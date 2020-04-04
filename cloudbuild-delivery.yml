@@ -6,21 +6,21 @@ steps:
   args:
   - 'apply'
   - '-f'
-  - '${_PRODUCTION_KUBERNETES_CONFIG_FILE_NAME}'
+  - 'kubernetes.yaml'
   env:
-  - 'CLOUDSDK_COMPUTE_ZONE=${_PRODUCTION_DEPLOY_ZONE}'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=${_PRODUCTION_DEPLOY_CLUSTER}'
+  - 'CLOUDSDK_COMPUTE_ZONE=Europe-west1-b'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-gke-staging'
 
 - name: 'gcr.io/cloud-builders/gcloud'
   id: 'Decrypt Github SSH Key for repository'
   args:
   - kms
   - decrypt
-  - --ciphertext-file=${_GITHUB_REPO_ENC_KEY_PATH}
+  - --ciphertext-file=repo-key-encrypted/id_rsa_repo_key.enc
   - --plaintext-file=/root/.ssh/id_rsa_repo_key
   - --location=global
-  - --keyring=${_GITHUB_REPO_KMS_KEYRING}
-  - --key=${_GITHUB_REPO_KEY}
+  - --keyring=cicd-keyring
+  - --key=cicd-key
   volumes:
   - name: 'ssh'
     path: /root/.ssh
@@ -50,14 +50,14 @@ steps:
   args:
   - '-c'
   - |
-    git clone git@github.com:${_GITHUB_REPO_USERNAME}/$REPO_NAME.git && \
-    cd $REPO_NAME && \
+    git clone git@github.com:frenkzappa/gcp-cnci.git && \
+    cd gcp-cnci && \
     git config user.email $(gcloud auth list --filter=status:ACTIVE --format='value(account)') && \
-    git fetch origin ${_PRODUCTION_BRANCH} && git checkout ${_PRODUCTION_BRANCH} && \
+    git fetch origin production && git checkout production && \
     git checkout $COMMIT_SHA ${_PRODUCTION_KUBERNETES_CONFIG_FILE_NAME} && \
-    git commit -m "Manifest from commit $COMMIT_SHA of ${_PRODUCTION_CANDIDATE_BRANCH}
+    git commit -m "Manifest from commit $COMMIT_SHA of production-candidate
     $(git log --format=%B -n 1 $COMMIT_SHA)" || true && \
-    git push origin ${_PRODUCTION_BRANCH} || true
+    git push origin production || true
   volumes:
   - name: 'ssh'
     path: /root/.ssh
