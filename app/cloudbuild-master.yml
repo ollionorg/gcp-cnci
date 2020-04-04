@@ -11,7 +11,7 @@ steps:
   args:
   - 'build'
   - '-t'
-  - 'gcr.io/$PROJECT_ID/gcp-cnci-example-app:$SHORT_SHA'
+  - 'gcr.io/cicd-fcamba/gcp-cnci-example-app:$SHORT_SHA'
   - 'app/'
 
 - name: 'gcr.io/cloud-builders/docker'
