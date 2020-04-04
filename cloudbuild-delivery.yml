@@ -17,7 +17,7 @@ steps:
   - kms
   - decrypt
   - --ciphertext-file=repo-key-encrypted/id_rsa_repo_key.enc
-  - --plaintext-file=/root/.ssh/id_rsa_repo_key
+  - --plaintext-file=/root/.ssh/id_rsa
   - --location=global
   - --keyring=cicd-keyring
   - --key=cicd-key
