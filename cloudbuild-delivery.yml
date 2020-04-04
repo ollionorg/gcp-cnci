@@ -8,7 +8,7 @@ steps:
   - '-f'
   - 'kubernetes.yaml'
   env:
-  - 'CLOUDSDK_COMPUTE_ZONE=Europe-west1-b'
+  - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
   - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-gke-staging'
 
 - name: 'gcr.io/cloud-builders/gcloud'
