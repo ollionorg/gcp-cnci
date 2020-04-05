@@ -28,7 +28,7 @@ steps:
   - '-c'
   - |
     cd app && \
-    sed "s/IMAGE_TO_DEPLOY/gcr.io\/cicd-fcamba\/:${SHORT_SHA}/g" staging-kubernetes.yaml.tpl > staging-kubernetes.yaml
+    sed "s/IMAGE_TO_DEPLOY/gcr.io\/cicd-fcamba\/gcp-cnci-example-app:${SHORT_SHA}/g" staging-kubernetes.yaml.tpl > staging-kubernetes.yaml
   volumes:
   - name: 'ssh'
     path: /root/.ssh
