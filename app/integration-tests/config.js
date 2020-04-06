@@ -1,3 +1,3 @@
 module.exports = {
-    API_BASE: 'http://35.240.202.244'
+    API_BASE: 'http://35.240.43.119/'
 }
