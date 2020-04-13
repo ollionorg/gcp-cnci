@@ -4,12 +4,12 @@ steps:
   entrypoint: /bin/sh
   args:
   - -c
-  - 'cd ${_APP_DIR} && npm install && npm test'
+  - 'cd app && npm install && npm test'
 
 - name: 'gcr.io/cloud-builders/docker'
   id: Build Docker Image
   args:
   - 'build'
   - '-t'
-  - '${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}'
-  - '${_APP_DIR}/'
+  - 'gcr.io/cicd-fcamba/gcp-cnci-example-app:${SHORT_SHA}'
+  - 'app/'
