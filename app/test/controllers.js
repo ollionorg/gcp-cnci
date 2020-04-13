@@ -1,7 +1,7 @@
 const assert = require('assert');
 const controllers = require('../src/controllers')
 
-const HOME_API_EXPECTED_MSG = 'Hello, Dublin!';
+const HOME_API_EXPECTED_MSG = 'Hello Dublin, from home!';
 
 describe('Controllers', function() {
   describe('hello', function() {
