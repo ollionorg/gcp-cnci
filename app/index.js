@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
         'staging': 'index',
         'production': 'index_dark'
     }
-    res.render(templateToServe[config.ENV_NAME], {hello: controllers.hello()})
+    res.render(templateToServe[config.ENV_NAME], {hellodd: controllers.hello()})
 });
 
 app.get('/hello', (req, res) => {
