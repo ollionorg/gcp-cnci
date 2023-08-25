@@ -14,7 +14,7 @@
     "express": "^4.17.1"
   },
   "devDependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "mocha": "^6.2.3"
   }
 }
